@@ -7,11 +7,10 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Created by rajeevkumarsingh on 02/08/17.
- */
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
+
+
     Optional<User> findByEmail(String email);
 
     Optional<User> findByUsernameOrEmail(String username, String email);
@@ -23,4 +22,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Boolean existsByUsername(String username);
 
     Boolean existsByEmail(String email);
+
+    Boolean existsByOtp(int otp);
+
+
 }

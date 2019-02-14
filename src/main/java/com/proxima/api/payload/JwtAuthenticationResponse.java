@@ -1,14 +1,19 @@
 package com.proxima.api.payload;
 
-/**
- * Created by rajeevkumarsingh on 19/08/17.
- */
+
 public class JwtAuthenticationResponse {
     private String accessToken;
     private String tokenType = "Bearer";
+    private String message;
+    private int status;
 
-    public JwtAuthenticationResponse(String accessToken) {
+    public JwtAuthenticationResponse() {
+    }
+
+    public JwtAuthenticationResponse(String accessToken, String message, int status) {
         this.accessToken = accessToken;
+        this.message = message;
+        this.status = status;
     }
 
     public String getAccessToken() {
@@ -25,5 +30,21 @@ public class JwtAuthenticationResponse {
 
     public void setTokenType(String tokenType) {
         this.tokenType = tokenType;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

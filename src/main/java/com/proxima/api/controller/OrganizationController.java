@@ -1,20 +1,15 @@
 package com.proxima.api.controller;
 
+
 import com.proxima.api.exception.AppException;
 import com.proxima.api.exception.ResourceNotFoundException;
 import com.proxima.api.model.Role;
 import com.proxima.api.model.RoleName;
 import com.proxima.api.model.User;
-//import com.example.polls.payload.*;
 import com.proxima.api.payload.*;
-import com.proxima.api.repository.PollRepository;
+import com.proxima.api.repository.RoleRepository;
 import com.proxima.api.repository.UserRepository;
-import com.proxima.api.repository.VoteRepository;
-import com.proxima.api.security.UserPrincipal;
 import com.proxima.api.service.FileStorageService;
-import com.proxima.api.service.PollService;
-import com.proxima.api.security.CurrentUser;
-import com.proxima.api.util.AppConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,38 +20,29 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
 import javax.mail.MessagingException;
-import javax.mail.Multipart;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 @RestController
-@RequestMapping("/api")
-public class UserController {
+@RequestMapping("/organiztion")
+public class OrganizationController {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+    private static final Logger logger = LoggerFactory.getLogger(OrganizationController.class);
 
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private PollRepository pollRepository;
-    @Autowired
-    private VoteRepository voteRepository;
-    @Autowired
-    private PollService pollService;
 
     @Autowired
     private JavaMailSender sender;
@@ -67,14 +53,8 @@ public class UserController {
     @Autowired
     private FileStorageService fileStorageService;
 
-
-
-    @GetMapping("/user/me")
-    @PreAuthorize("hasRole('USER')")
-    public UserSummary getCurrentUser(@CurrentUser UserPrincipal currentUser) {
-        UserSummary userSummary = new UserSummary(currentUser.getId(), currentUser.getUsername(), currentUser.getName());
-        return userSummary;
-    }
+    @Autowired
+    private RoleRepository roleRepository;
 
     @GetMapping("/user/checkUsernameAvailability")
     public UserIdentityAvailability checkUsernameAvailability(@RequestParam(value = "username") String username) {
@@ -91,20 +71,24 @@ public class UserController {
 
 
     @PostMapping("/user/profile")
-    public ResponseEntity registerUser(@RequestBody UserProfile userProfile) {
+    public ResponseEntity registerUser(@RequestBody OrganizationProfile organizationProfile) {
 
-        Boolean isAvailable = !userRepository.existsByUsername(userProfile.getUsername());
-        User user = userRepository.findByEmail(userProfile.getEmail()).orElseThrow(()->new ResourceNotFoundException("Email", "id", userProfile.getEmail()));
-        user.setName(userProfile.getName());
-        user.setUsername(userProfile.getUsername());
-        user.setNationality(userProfile.getNationality());
-        user.setMobile(userProfile.getMobile());
-
+        Role role = new Role();
+        Boolean isAvailable = !userRepository.existsByUsername(organizationProfile.getUsername());
+        User user = userRepository.findByEmail(organizationProfile.getEmail()).orElseThrow(()->new ResourceNotFoundException("Email", "id", organizationProfile.getEmail()));
+        user.setName(organizationProfile.getName());
+        user.setUsername(organizationProfile.getUsername());
+        user.setNationality(organizationProfile.getNationality());
+        user.setMobile(organizationProfile.getMobile());
+        user.setTags(organizationProfile.getTags());
+        user.setAbout(organizationProfile.getAbout());
+        Role userRole = roleRepository.findByName(RoleName.ROLE_ORGANIZATION).orElseThrow(() -> new AppException("User Role not set."));
+        user.setRoles(Collections.singleton(userRole));
         User result;
         if (isAvailable){
-             result = userRepository.save(user);
+            result = userRepository.save(user);
         }else{
-            return ResponseEntity.badRequest().body(new ApiResponse(false, "Username "+userProfile.getUsername()+" already exsit."));
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Username "+organizationProfile.getUsername()+" already exsit."));
         }
 
 
@@ -112,7 +96,7 @@ public class UserController {
                 .fromCurrentContextPath().path("/users/{username}")
                 .buildAndExpand(result.getUsername()).toUri();
 
-        return ResponseEntity.created(location).body(new ApiResponse(true, "User profile updated successfully"));
+        return ResponseEntity.created(location).body(new ApiResponse(true, "Organization profile updated successfully"));
     }
 
     @PostMapping(value = "/user/profilePic", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -165,11 +149,11 @@ public class UserController {
             e.printStackTrace();
 
         }
-            User user = userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("Email", "id", email));
-            user.setOtp(token);
-            userRepository.save(user);
-            sender.send(message);
-            return new ResponseEntity(new ApiResponse(true,"OTP sent"+email),HttpStatus.OK);
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("Email", "id", email));
+        user.setOtp(token);
+        userRepository.save(user);
+        sender.send(message);
+        return new ResponseEntity(new ApiResponse(true,"OTP sent"+email),HttpStatus.OK);
     }
 
     public int generateOTP(){
@@ -183,11 +167,11 @@ public class UserController {
 
 
         Boolean isMechted = userRepository.existsByOtp(OTP);
-            if (isMechted){
-                return new ResponseEntity(new ApiResponse(true,"OTP Matched."),HttpStatus.ACCEPTED);
-            }else {
-                return new ResponseEntity(new ApiResponse(false, "OTP Does not matched."), HttpStatus.NOT_FOUND);
-            }
+        if (isMechted){
+            return new ResponseEntity(new ApiResponse(true,"OTP Matched."),HttpStatus.ACCEPTED);
+        }else {
+            return new ResponseEntity(new ApiResponse(false, "OTP Does not matched."), HttpStatus.NOT_FOUND);
+        }
     }
 
     @PostMapping(value = "/user/resetPassword")
@@ -198,38 +182,4 @@ public class UserController {
         userRepository.save(user);
         return new ResponseEntity(new ApiResponse(true, "Password reset successfully."), HttpStatus.OK);
     }
-
-
-
-//
-//    @GetMapping("/users/{username}")
-//    public UserProfile getUserProfile(@PathVariable(value = "username") String username) {
-//        User user = userRepository.findByUsername(username)
-//                .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
-//
-//        long pollCount = pollRepository.countByCreatedBy(user.getId());
-//        long voteCount = voteRepository.countByUserId(user.getId());
-//
-//        UserProfile userProfile = new UserProfile(user.getId(), user.getUsername(), user.getName(), user.getCreatedAt(), pollCount, voteCount);
-//
-//        return userProfile;
-//    }
-//
-//    @GetMapping("/users/{username}/polls")
-//    public PagedResponse<PollResponse> getPollsCreatedBy(@PathVariable(value = "username") String username,
-//                                                         @CurrentUser UserPrincipal currentUser,
-//                                                         @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
-//                                                         @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) {
-//        return pollService.getPollsCreatedBy(username, currentUser, page, size);
-//    }
-//
-//
-//    @GetMapping("/users/{username}/votes")
-//    public PagedResponse<PollResponse> getPollsVotedBy(@PathVariable(value = "username") String username,
-//                                                       @CurrentUser UserPrincipal currentUser,
-//                                                       @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
-//                                                       @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) {
-//        return pollService.getPollsVotedBy(username, currentUser, page, size);
-//    }
-
 }

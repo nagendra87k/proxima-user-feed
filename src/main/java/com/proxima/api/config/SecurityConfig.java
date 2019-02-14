@@ -20,9 +20,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
-/**
- * Created by rajeevkumarsingh on 01/08/17.
- */
 
 @Configuration
 @EnableWebSecurity
@@ -86,11 +83,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/**/*.css",
                         "/**/*.js")
                         .permitAll()
-                    .antMatchers("/api/auth/**")
+                    .antMatchers("/api/auth/**","/organiztion/auth/signin","/organiztion/auth/signup")
                         .permitAll()
-                    .antMatchers("/api/user/checkUsernameAvailability", "/api/user/checkEmailAvailability")
+                    .antMatchers("/api/user/checkUsernameAvailability", "/api/user/checkEmailAvailability","/api/user/sendOTP","/api/user/validateOTP","/api/user/resetPassword","/api/user/profile","/api/user/profilePic","/api/user/loadfile")
                         .permitAll()
-                    .antMatchers(HttpMethod.GET, "/api/polls/**", "/api/users/**")
+                    .antMatchers("/organiztion/user/checkUsernameAvailability", "/organiztion/user/checkEmailAvailability","/organiztion/user/sendOTP","/organiztion/user/validateOTP","/organiztion/user/resetPassword","/organiztion/user/profile","/organiztion/user/profilePic","/organiztion/user/loadfile")
+                    .permitAll()
+                    .antMatchers(HttpMethod.GET, "/api/polls/**", "/api/users/**","/organiztion/users/**")
                         .permitAll()
                     .anyRequest()
                         .authenticated();

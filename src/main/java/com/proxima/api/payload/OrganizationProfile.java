@@ -1,8 +1,10 @@
 package com.proxima.api.payload;
 
-import java.time.Instant;
+import com.proxima.api.model.Role;
 
-public class UserProfile {
+import java.util.Set;
+
+public class OrganizationProfile {
 
     private Long id;
     private String email;
@@ -10,16 +12,23 @@ public class UserProfile {
     private String username;
     private String nationality;
     private Long mobile;
+    private String about;
+    private String tags;
+    private Set<Role> role;
 
-    public UserProfile() {
+    public OrganizationProfile() {
     }
 
-    public UserProfile(String email, String name, String username, String nationality, Long mobile) {
+    public OrganizationProfile(Long id, String email, String name, String username, String nationality, Long mobile, String about, String tags) {
+        this.id = id;
         this.email = email;
         this.name = name;
         this.username = username;
         this.nationality = nationality;
         this.mobile = mobile;
+        this.about = about;
+        this.tags = tags;
+
     }
 
     public Long getId() {
@@ -28,6 +37,14 @@ public class UserProfile {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getName() {
@@ -62,11 +79,19 @@ public class UserProfile {
         this.mobile = mobile;
     }
 
-    public String getEmail() {
-        return email;
+    public String getAbout() {
+        return about;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setAbout(String about) {
+        this.about = about;
+    }
+
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
     }
 }

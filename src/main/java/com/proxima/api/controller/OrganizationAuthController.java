@@ -31,8 +31,8 @@ import java.util.Collections;
 
 
 @RestController
-@RequestMapping("/api/auth")
-public class AuthController {
+@RequestMapping("/organiztion/auth")
+public class OrganizationAuthController {
 
     @Autowired
     AuthenticationManager authenticationManager;
@@ -72,7 +72,7 @@ public class AuthController {
         }
         User user = new User(signUpRequest.getEmail(), signUpRequest.getPassword());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
+        Role userRole = roleRepository.findByName(RoleName.ROLE_ORGANIZATION)
                 .orElseThrow(() -> new AppException("User Role not set."));
 
         user.setRoles(Collections.singleton(userRole));
@@ -81,6 +81,6 @@ public class AuthController {
                 .fromCurrentContextPath().path("/users/{username}")
                 .buildAndExpand(result.getUsername()).toUri();
 
-        return ResponseEntity.created(location).body(new ApiResponse(true, "User registered successfully"));
+        return ResponseEntity.created(location).body(new ApiResponse(true, "Organization registered successfully"));
     }
 }
