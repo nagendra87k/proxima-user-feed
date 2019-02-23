@@ -61,9 +61,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
-                .cors()
-                    .and()
+        http.cors().and()
                 .csrf()
                     .disable()
                 .exceptionHandling()
@@ -89,12 +87,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         .permitAll()
                     .antMatchers("/organiztion/user/checkUsernameAvailability", "/organiztion/user/checkEmailAvailability","/organiztion/user/sendOTP","/organiztion/user/validateOTP","/organiztion/user/resetPassword","/organiztion/user/profile","/organiztion/user/profilePic","/organiztion/user/loadfile")
                     .permitAll()
-                    .antMatchers(HttpMethod.GET, "/api/polls/**", "/api/users/**","/organiztion/users/**")
-                        .permitAll()
-                    .anyRequest()
-                        .authenticated();
-
-        // Add our custom JWT security filter
+                .antMatchers("/cause/casueType","/cause/create")
+                .permitAll()
+                .antMatchers(HttpMethod.GET, "/api/polls/**", "/api/users/**","/organiztion/users/**")
+                .permitAll()
+                .anyRequest()
+                .authenticated();
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
     }
