@@ -9,7 +9,6 @@ public class OrganizationProfile {
     private Long id;
     private String email;
     private String name;
-    private String username;
     private String nationality;
     private Long mobile;
     private String about;
@@ -19,16 +18,15 @@ public class OrganizationProfile {
     public OrganizationProfile() {
     }
 
-    public OrganizationProfile(Long id, String email, String name, String username, String nationality, Long mobile, String about, String tags) {
+    public OrganizationProfile(Long id, String email, String name, String nationality, Long mobile, String about, String tags, Set<Role> role) {
         this.id = id;
         this.email = email;
         this.name = name;
-        this.username = username;
         this.nationality = nationality;
         this.mobile = mobile;
         this.about = about;
         this.tags = tags;
-
+        this.role = role;
     }
 
     public Long getId() {
@@ -53,14 +51,6 @@ public class OrganizationProfile {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public String getNationality() {
@@ -93,5 +83,13 @@ public class OrganizationProfile {
 
     public void setTags(String tags) {
         this.tags = tags;
+    }
+
+    public Set<Role> getRole() {
+        return role;
+    }
+
+    public void setRole(Set<Role> role) {
+        this.role = role;
     }
 }

@@ -31,7 +31,7 @@ import java.util.Collections;
 
 
 @RestController
-@RequestMapping("/organiztion/auth")
+@RequestMapping("/organization/auth")
 public class OrganizationAuthController {
 
     @Autowired

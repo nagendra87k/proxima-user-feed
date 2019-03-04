@@ -36,7 +36,7 @@ import java.util.Random;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/organiztion")
+@RequestMapping("/organization")
 public class OrganizationController {
 
     private static final Logger logger = LoggerFactory.getLogger(OrganizationController.class);
@@ -71,39 +71,33 @@ public class OrganizationController {
 
 
     @PostMapping("/user/profile")
-    public ResponseEntity registerUser(@RequestBody OrganizationProfile organizationProfile) {
+    public ResponseEntity registerUser(@Valid @RequestBody OrganizationProfile organizationProfile) {
 
-        Role role = new Role();
-        Boolean isAvailable = !userRepository.existsByUsername(organizationProfile.getUsername());
         User user = userRepository.findByEmail(organizationProfile.getEmail()).orElseThrow(()->new ResourceNotFoundException("Email", "id", organizationProfile.getEmail()));
         user.setName(organizationProfile.getName());
-        user.setUsername(organizationProfile.getUsername());
         user.setNationality(organizationProfile.getNationality());
         user.setMobile(organizationProfile.getMobile());
         user.setTags(organizationProfile.getTags());
         user.setAbout(organizationProfile.getAbout());
         Role userRole = roleRepository.findByName(RoleName.ROLE_ORGANIZATION).orElseThrow(() -> new AppException("User Role not set."));
         user.setRoles(Collections.singleton(userRole));
-        User result;
-        if (isAvailable){
-            result = userRepository.save(user);
-        }else{
-            return ResponseEntity.badRequest().body(new ApiResponse(false, "Username "+organizationProfile.getUsername()+" already exsit."));
-        }
+        userRepository.save(user);
 
-
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentContextPath().path("/users/{username}")
-                .buildAndExpand(result.getUsername()).toUri();
-
-        return ResponseEntity.created(location).body(new ApiResponse(true, "Organization profile updated successfully"));
+        return ResponseEntity.ok().body(new ApiResponse(true, "Organization profile updated successfully"));
     }
 
     @PostMapping(value = "/user/profilePic", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public UploadFileResponse profilePic(@RequestParam(value = "file") MultipartFile file, @RequestParam("email") String email){
 
-        String fileName = fileStorageService.storeFile(file);
+
+        System.out.println("file = " + file.toString() + "email=" + email);
+
         User user = userRepository.findByEmail(email).orElseThrow(()->new ResourceNotFoundException("Email", "id", email));
+
+        Long id = user.getId();
+        String coustomName = "org-"+id;
+        String fileName = fileStorageService.storeFile(file,coustomName);
+
         user.setFileName(fileName);
         userRepository.save(user);
         String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()

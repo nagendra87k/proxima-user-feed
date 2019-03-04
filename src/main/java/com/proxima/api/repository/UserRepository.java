@@ -25,5 +25,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Boolean existsByOtp(int otp);
 
-
+    @Override
+    Optional<User> findById(Long aLong);
 }

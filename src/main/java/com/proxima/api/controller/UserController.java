@@ -118,8 +118,12 @@ public class UserController {
     @PostMapping(value = "/user/profilePic", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public UploadFileResponse profilePic(@RequestParam(value = "file") MultipartFile file, @RequestParam("email") String email){
 
-        String fileName = fileStorageService.storeFile(file);
         User user = userRepository.findByEmail(email).orElseThrow(()->new ResourceNotFoundException("Email", "id", email));
+        Long id = user.getId();
+        String coustomName = "user-"+id ;
+        String fileName = fileStorageService.storeFile(file,coustomName);
+
+
         user.setFileName(fileName);
         userRepository.save(user);
         String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()

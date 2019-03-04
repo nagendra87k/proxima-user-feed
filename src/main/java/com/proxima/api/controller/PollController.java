@@ -58,8 +58,7 @@ public class PollController {
 
 
     @GetMapping("/{pollId}")
-    public PollResponse getPollById(@CurrentUser UserPrincipal currentUser,
-                                    @PathVariable Long pollId) {
+    public PollResponse getPollById(@CurrentUser UserPrincipal currentUser, @PathVariable Long pollId) {
         return pollService.getPollById(pollId, currentUser);
     }
 

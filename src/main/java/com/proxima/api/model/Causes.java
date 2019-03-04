@@ -4,7 +4,9 @@ import com.proxima.api.model.audit.DateAudit;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -17,12 +19,14 @@ public class Causes extends DateAudit {
 
     private String cover;
     private String title;
+    private String email;
     @Lob
     @Column(length=1000000)
     private String description;
-    private String photos;
 
-//    private Set<CauseType> type = new HashSet<>();
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Photos> photos;
+
     private String location;
 
     public Causes() {
@@ -52,6 +56,14 @@ public class Causes extends DateAudit {
         this.title = title;
     }
 
+    public List<Photos> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(List<Photos> photos) {
+        this.photos = photos;
+    }
+
     public String getDescription() {
         return description;
     }
@@ -60,19 +72,19 @@ public class Causes extends DateAudit {
         this.description = description;
     }
 
-    public String getPhotos() {
-        return photos;
-    }
-
-    public void setPhotos(String photos) {
-        this.photos = photos;
-    }
-
     public String getLocation() {
         return location;
     }
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }
