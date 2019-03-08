@@ -27,4 +27,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Override
     Optional<User> findById(Long aLong);
+
+    User findUserById(Long id);
 }

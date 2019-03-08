@@ -7,7 +7,9 @@ import com.proxima.api.model.Causes;
 import com.proxima.api.model.Photos;
 import com.proxima.api.model.User;
 import com.proxima.api.payload.ApiResponse;
+import com.proxima.api.payload.CauseResponse;
 import com.proxima.api.payload.NewCauseRequst;
+import com.proxima.api.payload.OrganizationResponse;
 import com.proxima.api.repository.CauseRepository;
 import com.proxima.api.repository.CauseTypeRepository;
 import com.proxima.api.repository.PhotoRepository;
@@ -46,17 +48,19 @@ public class CauseController {
 
     @PostMapping(value = "/create",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Transactional
-    public ResponseEntity<?> createCause(@RequestPart(value = "cover") MultipartFile cover,@RequestPart(value = "photos") MultipartFile[] photos, @RequestPart(value = "newCauseRequst")  NewCauseRequst newCauseRequst){
+    public ResponseEntity<?> createCause(@RequestPart(value = "cover") MultipartFile cover,@RequestPart(value = "photos") MultipartFile[] photos, @RequestParam("title") String title,@RequestParam("description") String description,@RequestParam("location") String location,@RequestParam("email") String email){
 
-        User user = userRepository.findByEmail(newCauseRequst.getEmail()).orElseThrow(()->new ResourceNotFoundException("Email", "id", newCauseRequst.getEmail()));
+        User user = userRepository.findByEmail(email)
 
-        Boolean isAvailable = userRepository.existsByEmail(newCauseRequst.getEmail());
+                .orElseThrow(()->new ResourceNotFoundException("Email", "id", email));
+
+        Boolean isAvailable = userRepository.existsByEmail(email);
         Causes causes = new Causes();
 
-        causes.setTitle(newCauseRequst.getTitle());
-        causes.setDescription(newCauseRequst.getDescription());
-        causes.setLocation(newCauseRequst.getLocation());
-        causes.setEmail(newCauseRequst.getEmail());
+        causes.setTitle(title);
+        causes.setDescription(description);
+        causes.setLocation(location);
+        causes.setEmail(email);
 
         if (isAvailable){
             String coustomName;
@@ -95,7 +99,7 @@ public class CauseController {
             return ResponseEntity.ok(new ApiResponse(true, "Cause created successfully"));
 
         }else{
-            return ResponseEntity.badRequest().body(new ApiResponse(false, "Email id "+newCauseRequst.getEmail()+" doesn't exist."));
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Email id "+email+" doesn't exist."));
         }
 
     }
@@ -106,11 +110,43 @@ public class CauseController {
         return ResponseEntity.ok().body(causeType);
     }
 
-    @GetMapping("/organization")
-    public List<Causes> getOrganizationProfile(@RequestParam(value = "email") String email){
-//        User user = userRepository.findByEmail(email).orElseThrow(()->new ResourceNotFoundException("Email", "id", email));
-        return causeRepository.findByEmail(email);
-//        return ResponseEntity.ok(new ApiResponse(true,"Org profile"));
+    @PostMapping("/organization")
+    public Map<String, Object> getOrganizationProfile(@RequestParam(value = "email") String email){
+        Map<String, Object> orgnization = new HashMap();
+
+        User user = userRepository.findByEmail(email).orElseThrow(()->new ResourceNotFoundException("Email", "id", email));
+       User users = userRepository.findUserById(user.getId());
+        OrganizationResponse organizationResponse = new OrganizationResponse();
+        organizationResponse.setId(users.getId());
+        organizationResponse.setAbout(users.getAbout());
+        organizationResponse.setName(users.getName());
+        organizationResponse.setNationality(users.getNationality());
+        organizationResponse.setTags(users.getTags());
+        organizationResponse.setFollowers("22K");
+        organizationResponse.setTotal_raised(2400);
+        organizationResponse.getProfile_pic(users.getFileName());
+
+        List<Causes> causes = causeRepository.findByEmail(email);
+
+
+//        causes.forEach(
+//
+//                cause->causeResponse.setId(cause.getId()),
+//                cause1->causeResponse.setCover(causes.)
+//        );
+//        for (Causes causes1 : causes) {
+//            CauseResponse causeResponse = new CauseResponse();
+//            causeResponse.setId(causes.);
+//            causeResponse.setCover(causes.);
+//            causeResponse.setTitle(causes.getTitle());
+//            causeResponse.setAmount("2000");
+//        }
+
+
+
+        orgnization.put("organization",organizationResponse);
+        orgnization.put("causes",causes);
+        return orgnization;
     }
 
 }
