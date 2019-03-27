@@ -4,6 +4,7 @@ public class CauseListResponse {
 
     private Long id;
     private String title;
+    private String amount;
 
     public Long getId() {
         return id;
@@ -19,5 +20,13 @@ public class CauseListResponse {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getAmount() {
+        return amount;
+    }
+
+    public void setAmount(String amount) {
+        this.amount = amount;
     }
 }

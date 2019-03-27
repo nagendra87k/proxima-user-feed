@@ -3,6 +3,7 @@ package com.proxima.ngo.api.model;
 import com.proxima.ngo.api.model.audit.DateAudit;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Posts extends DateAudit {
@@ -17,8 +18,8 @@ public class Posts extends DateAudit {
     @JoinColumn
     private Causes causes;
 
-//    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-//    private List<PostImaes> postImaes;
+    @OneToMany(mappedBy = "posts", cascade = CascadeType.ALL)
+    private List<PostImaes> postImaes;
 
     private String description;
 

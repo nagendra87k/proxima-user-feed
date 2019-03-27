@@ -13,9 +13,9 @@ public class Photos {
     private String name;
     private String type;
 
-//    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-//    @JoinColumn()
-//    private Causes causes;
+    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @JoinColumn()
+    private Causes causes;
 
     public Photos() {
     }
@@ -43,5 +43,13 @@ public class Photos {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public Causes getCauses() {
+        return causes;
+    }
+
+    public void setCauses(Causes causes) {
+        this.causes = causes;
     }
 }

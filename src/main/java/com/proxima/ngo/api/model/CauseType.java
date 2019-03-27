@@ -12,9 +12,9 @@ public class CauseType {
     private Long id;
     private String title;
 
-//    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-//    @JoinColumn()
-//    private Causes causes;
+    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @JoinColumn()
+    private Causes causes;
 
     public CauseType() {
     }
@@ -33,5 +33,13 @@ public class CauseType {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public Causes getCauses() {
+        return causes;
+    }
+
+    public void setCauses(Causes causes) {
+        this.causes = causes;
     }
 }

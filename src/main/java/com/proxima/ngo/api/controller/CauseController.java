@@ -13,9 +13,11 @@ import com.proxima.ngo.api.repository.CauseTypeRepository;
 import com.proxima.ngo.api.repository.PhotoRepository;
 import com.proxima.ngo.api.repository.UserRepository;
 import com.proxima.ngo.api.service.FileStorageService;
+import com.proxima.ngo.api.util.ObjectMapperUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -25,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import springfox.documentation.swagger2.mappers.ModelMapper;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -53,6 +55,8 @@ public class CauseController {
     @Autowired
     private PhotoRepository photoRepository;
 
+    @Autowired
+    private ModelMapper modelMapper;
 
     @PostMapping(value = "/create",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Transactional
@@ -71,7 +75,6 @@ public class CauseController {
             Long causeId = causes1.getId();
             Long orgId = user.getId();
             coustomName = orgId+"-"+causeId+"-cover";
-            //String fileName = ;
             causes.setCover(fileStorageService.storeFile(cover,coustomName));
             String uploadedFileName = Arrays.stream(photos).map(x -> x.getOriginalFilename()).filter(x -> !StringUtils.isEmpty(x)).collect(Collectors.joining(" , "));
             if (StringUtils.isEmpty(uploadedFileName)) {
@@ -115,10 +118,8 @@ public class CauseController {
         Map<String, Object> organization = new HashMap();
         User user = userRepository.findByEmail(userProfile.getEmail()).orElseThrow(()->new ResourceNotFoundException("Email", "id", userProfile.getEmail()));
         User users = userRepository.findUserById(user.getId());
-//        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("organization/loadfile/").path(users.getFileName()).toUriString();
         OrganizationResponse organizationResponse = new OrganizationResponse();
         organizationResponse.setId(users.getId());
-        //organizationResponse.setProfile_pic(new UploadFileResponse(fileDownloadUri));
         organizationResponse.setProfile_pic(users.getFileName());
         organizationResponse.setName(users.getName());
         organizationResponse.setNationality(users.getNationality());
@@ -137,13 +138,6 @@ public class CauseController {
     public ResponseEntity getCauseDetailsById(@RequestParam(value = "id", required = true) Long id){
 
         Optional<Causes> causes = causeRepository.findById(id);
-//        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("organization/loadfile/").path(causes.getCover()).toUriString();
-//        CauseResponse causeResponse = new CauseResponse();
-//        causeResponse.setId(causes.getId());
-//        causeResponse.setAmount("500");
-//        causeResponse.setTitle(causes.getTitle());
-//        causeResponse.setCover(fileDownloadUri);
-//        causeResponse.setPhotos(causes.getPhotos());
         return ResponseEntity.ok().body(causes);
     }
 
@@ -197,10 +191,11 @@ public class CauseController {
     }
 
     @GetMapping("/causeList")
-    public ResponseEntity getCauseListByOrgranzationId(@RequestParam(value = "email") String email){
+    public ResponseEntity<?> getCauseListByOrgranzationId(@RequestParam(value = "email") String email){
 
         List<Causes> causes = causeRepository.findAllByEmail(email);
-        return ResponseEntity.ok().body(causes);
+        List<CauseListResponse> listResponseList = ObjectMapperUtils.mapAll(causes, CauseListResponse.class);
+        return ResponseEntity.ok().body(listResponseList);
     }
     @GetMapping("/loadfile/{fileName:.+}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String fileName, HttpServletRequest request) {

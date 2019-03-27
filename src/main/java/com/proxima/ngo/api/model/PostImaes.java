@@ -11,9 +11,12 @@ public class PostImaes implements Serializable {
     private Long id;
     private String name;
     private String type;
+
     @ManyToOne
     @JoinColumn()
     private Posts posts;
+
+
 
     public PostImaes() {
     }
@@ -42,4 +45,11 @@ public class PostImaes implements Serializable {
         this.type = type;
     }
 
+    public Posts getPosts() {
+        return posts;
+    }
+
+    public void setPosts(Posts posts) {
+        this.posts = posts;
+    }
 }

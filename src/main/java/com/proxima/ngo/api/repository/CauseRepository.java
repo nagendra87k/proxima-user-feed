@@ -13,6 +13,8 @@ public interface CauseRepository extends JpaRepository<Causes,Long> {
     List<Causes> findByEmail(String email);
     void deleteById(Long id);
     Optional<Causes> findById(Long id);
+
+
     List<Causes> findAllByEmail(String email);
 
 

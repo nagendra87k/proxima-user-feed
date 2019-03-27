@@ -27,11 +27,11 @@ public class Causes extends DateAudit {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Photos> photos;
 
-//    @OneToMany(mappedBy = "causes", cascade = CascadeType.ALL)
-//    private Set<Posts> posts;
+    @OneToMany(mappedBy = "causes", cascade = CascadeType.ALL)
+    private List<Posts> posts;
 
-//    @OneToMany(mappedBy = "causes", cascade = CascadeType.ALL)
-//    private Set<CauseType> types;
+    @OneToMany(mappedBy = "causes", cascade = CascadeType.ALL)
+    private Set<CauseType> types;
 
 
 
@@ -94,11 +94,19 @@ public class Causes extends DateAudit {
         this.email = email;
     }
 
-//    public Set<CauseType> getTypes() {
-//        return types;
-//    }
-//
-//    public void setTypes(Set<CauseType> types) {
-//        this.types = types;
-//    }
+    public List<Posts> getPosts() {
+        return posts;
+    }
+
+    public void setPosts(List<Posts> posts) {
+        this.posts = posts;
+    }
+
+    public Set<CauseType> getTypes() {
+        return types;
+    }
+
+    public void setTypes(Set<CauseType> types) {
+        this.types = types;
+    }
 }
