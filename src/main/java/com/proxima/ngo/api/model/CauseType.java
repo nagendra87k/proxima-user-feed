@@ -12,7 +12,7 @@ public class CauseType {
     private Long id;
     private String title;
 
-    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @JoinColumn()
     private Causes causes;
 

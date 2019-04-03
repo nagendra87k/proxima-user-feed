@@ -2,22 +2,14 @@ package com.proxima.ngo.api.controller;
 
 
 import com.proxima.ngo.api.exception.ResourceNotFoundException;
-import com.proxima.ngo.api.model.CauseType;
-import com.proxima.ngo.api.model.Causes;
-import com.proxima.ngo.api.model.Photos;
-import com.proxima.ngo.api.model.User;
+import com.proxima.ngo.api.model.*;
 import com.proxima.ngo.api.payload.*;
-import com.proxima.ngo.api.payload.*;
-import com.proxima.ngo.api.repository.CauseRepository;
-import com.proxima.ngo.api.repository.CauseTypeRepository;
-import com.proxima.ngo.api.repository.PhotoRepository;
-import com.proxima.ngo.api.repository.UserRepository;
+import com.proxima.ngo.api.repository.*;
 import com.proxima.ngo.api.service.FileStorageService;
 import com.proxima.ngo.api.util.ObjectMapperUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -27,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import springfox.documentation.swagger2.mappers.ModelMapper;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -53,10 +44,12 @@ public class CauseController {
     private FileStorageService fileStorageService;
 
     @Autowired
-    private PhotoRepository photoRepository;
+    private PostRepository postRepository;
 
     @Autowired
-    private ModelMapper modelMapper;
+    private PhotoRepository photoRepository;
+
+
 
     @PostMapping(value = "/create",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Transactional
@@ -93,7 +86,6 @@ public class CauseController {
                 photos1.setName(fileStorageService.storeFile(photo,coustomFileName));
                 photos1.setType(extn);
                 fileNames.add(photos1);
-//                photos1.setName(coustomName);
                 i++;
             }
             causes.setPhotos(fileNames);
@@ -136,7 +128,6 @@ public class CauseController {
 
     @GetMapping("/details")
     public ResponseEntity getCauseDetailsById(@RequestParam(value = "id", required = true) Long id){
-
         Optional<Causes> causes = causeRepository.findById(id);
         return ResponseEntity.ok().body(causes);
     }
@@ -191,12 +182,13 @@ public class CauseController {
     }
 
     @GetMapping("/causeList")
-    public ResponseEntity<?> getCauseListByOrgranzationId(@RequestParam(value = "email") String email){
+    public ResponseEntity<?> getCauseListByOrgranzationId(@RequestBody @RequestParam(value = "email") String email){
 
         List<Causes> causes = causeRepository.findAllByEmail(email);
         List<CauseListResponse> listResponseList = ObjectMapperUtils.mapAll(causes, CauseListResponse.class);
         return ResponseEntity.ok().body(listResponseList);
     }
+
     @GetMapping("/loadfile/{fileName:.+}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String fileName, HttpServletRequest request) {
 
@@ -210,7 +202,71 @@ public class CauseController {
         if(contentType == null) {
             contentType = "application/octet-stream";
         }
-
         return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType)).header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"").body(resource);
+    }
+
+    @PostMapping(value = "/create-post",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Transactional
+    public ResponseEntity<?> createPost(@RequestBody @RequestParam(value = "cause_id", required = true) Long cause_id, @RequestPart(value = "primary_photo") MultipartFile primary_photo,@RequestPart(value = "images") MultipartFile[] images, @RequestParam("description") String description){
+
+        Boolean isAvailable = causeRepository.existsById(cause_id);
+        Causes causes = causeRepository.findCausesById(cause_id);
+        User org = userRepository.findByEmailOrId(causes.getEmail());
+        Posts posts = new Posts();
+        posts.setDescription(description);
+        if (isAvailable){
+            Posts postsData = postRepository.save(posts);
+            Long postId = postsData.getId();
+            String coustomName = org.getId()+"-"+cause_id+"-"+postId+"-primary";
+            posts.setPrimaryPhoto(fileStorageService.storeFile(primary_photo,coustomName));
+            String uploadedFileName = Arrays.stream(images).map(x -> x.getOriginalFilename()).filter(x -> !StringUtils.isEmpty(x)).collect(Collectors.joining(" , "));
+            if (StringUtils.isEmpty(uploadedFileName)) {
+                return new ResponseEntity<String>("please select files!", HttpStatus.OK);
+            }
+            if (images.length==0) {
+                return new ResponseEntity<String>("please select files!", HttpStatus.OK);
+            }
+            List<PostImages> postImagesList = new ArrayList<>();
+            int i=1;
+            for(MultipartFile photo : images) {
+                String extn = photo.getOriginalFilename().substring( photo.getOriginalFilename().lastIndexOf(".") + 1);
+                PostImages postImages = new PostImages();
+                String coustomFileName = org.getId()+"-"+cause_id+"-"+postId+"-"+ i;
+                postImages.setName(fileStorageService.storeFile(photo,coustomFileName));
+                postImages.setType(extn);
+                postImagesList.add(postImages);
+                i++;
+            }
+            posts.setPostImaes(postImagesList);
+            postRepository.save(posts);
+            return ResponseEntity.ok(new ApiResponse(true, "Post Created successfully"));
+
+        }else{
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Cause id "+cause_id+" doesn't exist."));
+        }
+    }
+    @GetMapping(value = "/feeds")
+    @Transactional
+    public ResponseEntity<?> getOrganizationFeeds(@RequestBody @RequestParam(value = "email", required = true) String email) {
+
+        Map<String,Object> map = new HashMap<>();
+        Boolean isAvailable = userRepository.existsByEmail(email);
+        if (isAvailable) {
+
+            List<Causes> causes = causeRepository.findAllByEmail(email);
+            List<CauseFeedResponse> causeFeedResponses = ObjectMapperUtils.mapAll(causes, CauseFeedResponse.class);
+            map.put("new_cause",causeFeedResponses);
+
+            List<Posts> posts = postRepository.findAll();
+            List<PostFeedResponse> feedResponseList = ObjectMapperUtils.mapAll(posts, PostFeedResponse.class);
+            map.put("updated_cause",feedResponseList);
+
+            List<WeeklyRaisedFeedResponse> weeklyRaisedFeedResponses = ObjectMapperUtils.mapAll(causes, WeeklyRaisedFeedResponse.class);
+            map.put("weekly_Raised",weeklyRaisedFeedResponses);
+
+            return ResponseEntity.ok().body(map);
+        } else {
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Email id " + email + " doesn't exist."));
+        }
     }
 }

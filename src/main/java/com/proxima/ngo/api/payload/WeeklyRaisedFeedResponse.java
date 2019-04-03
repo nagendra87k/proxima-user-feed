@@ -1,19 +1,12 @@
 package com.proxima.ngo.api.payload;
 
-public class CauseListResponse {
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
-    private Long id;
+@JsonAutoDetect
+public class WeeklyRaisedFeedResponse{
+
     private String title;
-    private String cover;
     private String amount;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getTitle() {
         return title;
@@ -29,13 +22,5 @@ public class CauseListResponse {
 
     public void setAmount(String amount) {
         this.amount = amount;
-    }
-
-    public String getCover() {
-        return cover;
-    }
-
-    public void setCover(String cover) {
-        this.cover = cover;
     }
 }

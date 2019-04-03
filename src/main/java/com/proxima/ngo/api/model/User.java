@@ -32,14 +32,10 @@ public class User extends DateAudit {
 
     @Size(max = 100)
     private String password;
-
     private int otp;
-
     private String nationality;
     private Long mobile;
-
     private String fileName;
-
     private String about;
     private String tags;
 

@@ -1,10 +1,15 @@
 package com.proxima.ngo.api.payload;
 
-public class CauseListResponse {
+import com.proxima.ngo.api.model.Photos;
+
+import java.util.List;
+
+public class CauseFeedResponse {
 
     private Long id;
     private String title;
-    private String cover;
+    private String description;
+    private List<Photos> photos;
     private String amount;
 
     public Long getId() {
@@ -23,6 +28,14 @@ public class CauseListResponse {
         this.title = title;
     }
 
+    public List<Photos> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(List<Photos> photos) {
+        this.photos = photos;
+    }
+
     public String getAmount() {
         return amount;
     }
@@ -31,11 +44,11 @@ public class CauseListResponse {
         this.amount = amount;
     }
 
-    public String getCover() {
-        return cover;
+    public String getDescription() {
+        return description;
     }
 
-    public void setCover(String cover) {
-        this.cover = cover;
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

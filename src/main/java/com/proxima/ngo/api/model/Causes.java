@@ -1,5 +1,6 @@
 package com.proxima.ngo.api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.proxima.ngo.api.model.audit.DateAudit;
 
 import javax.persistence.*;
@@ -25,12 +26,15 @@ public class Causes extends DateAudit {
 
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonIgnore
     private List<Photos> photos;
 
-    @OneToMany(mappedBy = "causes", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "causes", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Posts> posts;
 
-    @OneToMany(mappedBy = "causes", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "causes", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonIgnore
     private Set<CauseType> types;
 
 

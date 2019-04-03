@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-public class PostImaes implements Serializable {
+public class PostImages implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -12,13 +12,13 @@ public class PostImaes implements Serializable {
     private String name;
     private String type;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     @JoinColumn()
     private Posts posts;
 
 
 
-    public PostImaes() {
+    public PostImages() {
     }
 
     public Long getId() {

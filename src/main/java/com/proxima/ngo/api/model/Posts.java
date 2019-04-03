@@ -1,25 +1,27 @@
 package com.proxima.ngo.api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.proxima.ngo.api.model.audit.DateAudit;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
+
 public class Posts extends DateAudit {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String primaryPhoto;
 
-    @ManyToOne
+    @ManyToOne()
     @JoinColumn
     private Causes causes;
 
-    @OneToMany(mappedBy = "posts", cascade = CascadeType.ALL)
-    private List<PostImaes> postImaes;
+    @OneToMany(mappedBy = "posts", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<PostImages> postImaes;
 
     private String description;
 
@@ -47,13 +49,13 @@ public class Posts extends DateAudit {
         this.causes = causes;
     }
 
-//    public List<PostImaes> getPostImaes() {
-//        return postImaes;
-//    }
-//
-//    public void setPostImaes(List<PostImaes> postImaes) {
-//        this.postImaes = postImaes;
-//    }
+    public List<PostImages> getPostImaes() {
+        return postImaes;
+    }
+
+    public void setPostImaes(List<PostImages> postImaes) {
+        this.postImaes = postImaes;
+    }
 
     public String getDescription() {
         return description;
