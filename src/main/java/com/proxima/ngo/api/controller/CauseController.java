@@ -11,6 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -226,18 +229,18 @@ public class CauseController {
             if (images.length==0) {
                 return new ResponseEntity<String>("please select files!", HttpStatus.OK);
             }
-            List<PostImages> postImagesList = new ArrayList<>();
+            List<Images> imagesList = new ArrayList<>();
             int i=1;
             for(MultipartFile photo : images) {
                 String extn = photo.getOriginalFilename().substring( photo.getOriginalFilename().lastIndexOf(".") + 1);
-                PostImages postImages = new PostImages();
+                Images postImages = new Images();
                 String coustomFileName = org.getId()+"-"+cause_id+"-"+postId+"-"+ i;
                 postImages.setName(fileStorageService.storeFile(photo,coustomFileName));
                 postImages.setType(extn);
-                postImagesList.add(postImages);
+                imagesList.add(postImages);
                 i++;
             }
-            posts.setPostImaes(postImagesList);
+            posts.setPostImaes(imagesList);
             postRepository.save(posts);
             return ResponseEntity.ok(new ApiResponse(true, "Post Created successfully"));
 
@@ -245,21 +248,26 @@ public class CauseController {
             return ResponseEntity.badRequest().body(new ApiResponse(false, "Cause id "+cause_id+" doesn't exist."));
         }
     }
+
     @GetMapping(value = "/feeds")
     @Transactional
-    public ResponseEntity<?> getOrganizationFeeds(@RequestBody @RequestParam(value = "email", required = true) String email) {
+    public ResponseEntity<?> getOrganizationFeeds(@RequestBody @RequestParam(value = "email", required = true) String email,@RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "limit", defaultValue = "5") int limit) {
 
+        Pageable pageable = PageRequest.of(page, limit);
         Map<String,Object> map = new HashMap<>();
         Boolean isAvailable = userRepository.existsByEmail(email);
+        User org = userRepository.findByEmailOrId(email);
+        String orgName = org.getName();
         if (isAvailable) {
 
-            List<Causes> causes = causeRepository.findAllByEmail(email);
+            List<Causes> causes = causeRepository.findAllByEmail(email,pageable);
             List<CauseFeedResponse> causeFeedResponses = ObjectMapperUtils.mapAll(causes, CauseFeedResponse.class);
-            map.put("new_cause",causeFeedResponses);
+            map.put("cause",causeFeedResponses);
 
-            List<Posts> posts = postRepository.findAll();
+            List<Posts> posts = postRepository.findAllPosts(pageable);
+
             List<PostFeedResponse> feedResponseList = ObjectMapperUtils.mapAll(posts, PostFeedResponse.class);
-            map.put("updated_cause",feedResponseList);
+            map.put("post",feedResponseList);
 
             List<WeeklyRaisedFeedResponse> weeklyRaisedFeedResponses = ObjectMapperUtils.mapAll(causes, WeeklyRaisedFeedResponse.class);
             map.put("weekly_Raised",weeklyRaisedFeedResponses);

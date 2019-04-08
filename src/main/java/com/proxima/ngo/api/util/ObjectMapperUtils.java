@@ -1,7 +1,11 @@
 package com.proxima.ngo.api.util;
 
+import com.proxima.ngo.api.model.Posts;
+import com.proxima.ngo.api.payload.CauseFeedResponse;
+import com.proxima.ngo.api.payload.PostFeedResponse;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.data.domain.Page;
 
 import java.util.Collection;
 import java.util.List;
@@ -51,9 +55,9 @@ public class ObjectMapperUtils {
      * @return list of mapped object with <code><D></code> type.
      */
     public static <D, T> List<D> mapAll(final Collection<T> entityList, Class<D> outCLass) {
-        return entityList.stream()
-                .map(entity -> map(entity, outCLass))
-                .collect(Collectors.toList());
+
+        return entityList.stream().map(entity -> map(entity, outCLass)).collect(Collectors.toList());
+
     }
 
     /**
@@ -66,4 +70,6 @@ public class ObjectMapperUtils {
         modelMapper.map(source, destination);
         return destination;
     }
+
+
 }

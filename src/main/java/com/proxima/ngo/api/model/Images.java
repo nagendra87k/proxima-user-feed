@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-public class PostImages implements Serializable {
+public class Images implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,7 +18,7 @@ public class PostImages implements Serializable {
 
 
 
-    public PostImages() {
+    public Images() {
     }
 
     public Long getId() {

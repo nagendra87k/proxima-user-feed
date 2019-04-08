@@ -1,11 +1,13 @@
 package com.proxima.ngo.api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.proxima.ngo.api.model.audit.DateAudit;
 import org.hibernate.annotations.NaturalId;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Size;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -36,6 +38,8 @@ public class User extends DateAudit {
     private String nationality;
     private Long mobile;
     private String fileName;
+
+    @Column(length = 500)
     private String about;
     private String tags;
 
@@ -44,6 +48,11 @@ public class User extends DateAudit {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
+
+
+//    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+//    @JsonIgnore
+//    private Set<Causes> causes = new HashSet<>();
 
     public User() {
 
@@ -156,4 +165,12 @@ public class User extends DateAudit {
     public void setTags(String tags) {
         this.tags = tags;
     }
+
+//    public Set<Causes> getCauses() {
+//        return causes;
+//    }
+//
+//    public void setCauses(Set<Causes> causes) {
+//        this.causes = causes;
+//    }
 }

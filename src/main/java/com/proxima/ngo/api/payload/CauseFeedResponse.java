@@ -2,6 +2,7 @@ package com.proxima.ngo.api.payload;
 
 import com.proxima.ngo.api.model.Photos;
 
+import java.time.Instant;
 import java.util.List;
 
 public class CauseFeedResponse {
@@ -11,6 +12,8 @@ public class CauseFeedResponse {
     private String description;
     private List<Photos> photos;
     private String amount;
+    private Instant createdAt;
+    private String organizationName = "Wild";
 
     public Long getId() {
         return id;
@@ -50,5 +53,21 @@ public class CauseFeedResponse {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getOrganizationName() {
+        return organizationName;
+    }
+
+    public void setOrganizationName(String organizationName) {
+        this.organizationName = organizationName;
     }
 }

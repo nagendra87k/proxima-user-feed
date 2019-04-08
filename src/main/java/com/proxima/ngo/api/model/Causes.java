@@ -19,23 +19,32 @@ public class Causes extends DateAudit {
     private String cover;
     private String title;
     private String email;
-    @Lob
-    @Column(length=1000000)
+
+    @Column(length=500)
     private String description;
     private String location;
 
 
+
+//
+//    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+//    @JoinColumn()
+//    private User user;
+
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JsonIgnore
+//    @JsonIgnore
     private List<Photos> photos;
 
-    @OneToMany(mappedBy = "causes", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany( cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Posts> posts;
 
-    @OneToMany(mappedBy = "causes", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany( cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonIgnore
     private Set<CauseType> types;
+
+
+
 
 
 
@@ -113,4 +122,12 @@ public class Causes extends DateAudit {
     public void setTypes(Set<CauseType> types) {
         this.types = types;
     }
+
+//    public User getUser() {
+//        return user;
+//    }
+//
+//    public void setUser(User user) {
+//        this.user = user;
+//    }
 }

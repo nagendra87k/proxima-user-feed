@@ -1,15 +1,17 @@
 package com.proxima.ngo.api.payload;
 
-import com.proxima.ngo.api.model.PostImages;
+import com.proxima.ngo.api.model.Images;
 
-import java.util.ArrayList;
+import java.time.Instant;
 import java.util.List;
 
 public class PostFeedResponse {
 
     private Long id;
     private String description;
-    private List<PostImages> postImages = new ArrayList<>();
+    private Instant createdAt;
+    private List<Images> images;
+    private String organizationName = "Wild";
 
     public Long getId() {
         return id;
@@ -27,11 +29,27 @@ public class PostFeedResponse {
         this.description = description;
     }
 
-    public List<PostImages> getPostImages() {
-        return postImages;
+    public List<Images> getImages() {
+        return images;
     }
 
-    public void setPostImages(List<PostImages> postImages) {
-        this.postImages = postImages;
+    public void setImages(List<Images> images) {
+        this.images = images;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getOrganizationName() {
+        return organizationName;
+    }
+
+    public void setOrganizationName(String organizationName) {
+        this.organizationName = organizationName;
     }
 }
