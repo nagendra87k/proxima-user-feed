@@ -254,25 +254,24 @@ public class CauseController {
     public ResponseEntity<?> getOrganizationFeeds(@RequestBody @RequestParam(value = "email", required = true) String email,@RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "limit", defaultValue = "5") int limit) {
 
         Pageable pageable = PageRequest.of(page, limit);
-        Map<String,Object> map = new HashMap<>();
         Boolean isAvailable = userRepository.existsByEmail(email);
         User org = userRepository.findByEmailOrId(email);
-        String orgName = org.getName();
         if (isAvailable) {
 
+            List<Object> resultsData = new ArrayList<>();
             List<Causes> causes = causeRepository.findAllByEmail(email,pageable);
             List<CauseFeedResponse> causeFeedResponses = ObjectMapperUtils.mapAll(causes, CauseFeedResponse.class);
-            map.put("cause",causeFeedResponses);
-
             List<Posts> posts = postRepository.findAllPosts(pageable);
-
             List<PostFeedResponse> feedResponseList = ObjectMapperUtils.mapAll(posts, PostFeedResponse.class);
-            map.put("post",feedResponseList);
-
             List<WeeklyRaisedFeedResponse> weeklyRaisedFeedResponses = ObjectMapperUtils.mapAll(causes, WeeklyRaisedFeedResponse.class);
-            map.put("weekly_Raised",weeklyRaisedFeedResponses);
 
-            return ResponseEntity.ok().body(map);
+            resultsData.addAll(causeFeedResponses);
+            resultsData.addAll(feedResponseList);
+            resultsData.addAll(weeklyRaisedFeedResponses);
+
+//            resultsData.stream().sorted((object1, object2) -> object1..compareTo(object2.getName()));
+            return ResponseEntity.ok().body(resultsData);
+
         } else {
             return ResponseEntity.badRequest().body(new ApiResponse(false, "Email id " + email + " doesn't exist."));
         }

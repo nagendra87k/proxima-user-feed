@@ -32,7 +32,6 @@ public class Causes extends DateAudit {
 //    private User user;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-//    @JsonIgnore
     private List<Photos> photos;
 
     @OneToMany( cascade = CascadeType.ALL, fetch = FetchType.LAZY)

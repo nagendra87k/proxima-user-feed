@@ -12,6 +12,7 @@ public class PostFeedResponse {
     private Instant createdAt;
     private List<Images> images;
     private String organizationName = "Wild";
+    private String Feedtype = "Post";
 
     public Long getId() {
         return id;
@@ -51,5 +52,13 @@ public class PostFeedResponse {
 
     public void setOrganizationName(String organizationName) {
         this.organizationName = organizationName;
+    }
+
+    public String getFeedtype() {
+        return Feedtype;
+    }
+
+    public void setFeedtype(String feedtype) {
+        Feedtype = feedtype;
     }
 }

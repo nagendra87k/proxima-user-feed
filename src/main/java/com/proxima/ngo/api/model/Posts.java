@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-
 public class Posts extends DateAudit {
 
     @Id

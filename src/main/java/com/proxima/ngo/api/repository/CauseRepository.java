@@ -26,4 +26,9 @@ public interface CauseRepository extends PagingAndSortingRepository<Causes,Long>
     List<Causes> findAll(Sort sort);
 
     List<Causes> findAllByEmail(String email);
+
+
+
+    @Query("SELECT c.title,c.email,c.description,c.posts FROM Causes c INNER JOIN c.posts p")
+    List<Causes> fetchCausePostData();
 }

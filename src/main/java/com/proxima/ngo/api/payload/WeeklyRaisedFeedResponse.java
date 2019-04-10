@@ -7,6 +7,7 @@ public class WeeklyRaisedFeedResponse{
 
     private String title;
     private String amount;
+    private String Feedtype = "Raised";
 
     public String getTitle() {
         return title;
@@ -22,5 +23,13 @@ public class WeeklyRaisedFeedResponse{
 
     public void setAmount(String amount) {
         this.amount = amount;
+    }
+
+    public String getFeedtype() {
+        return Feedtype;
+    }
+
+    public void setFeedtype(String feedtype) {
+        Feedtype = feedtype;
     }
 }

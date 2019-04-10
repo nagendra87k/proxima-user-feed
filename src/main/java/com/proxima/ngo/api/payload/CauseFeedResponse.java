@@ -14,6 +14,7 @@ public class CauseFeedResponse {
     private String amount;
     private Instant createdAt;
     private String organizationName = "Wild";
+    private String Feedtype = "Cause";
 
     public Long getId() {
         return id;
@@ -69,5 +70,13 @@ public class CauseFeedResponse {
 
     public void setOrganizationName(String organizationName) {
         this.organizationName = organizationName;
+    }
+
+    public String getFeedtype() {
+        return Feedtype;
+    }
+
+    public void setFeedtype(String feedtype) {
+        Feedtype = feedtype;
     }
 }
