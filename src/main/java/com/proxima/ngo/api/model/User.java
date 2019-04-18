@@ -50,9 +50,8 @@ public class User extends DateAudit {
     private Set<Role> roles = new HashSet<>();
 
 
-//    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-//    @JsonIgnore
-//    private Set<Causes> causes = new HashSet<>();
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Causes> causes;
 
     public User() {
 
@@ -166,11 +165,11 @@ public class User extends DateAudit {
         this.tags = tags;
     }
 
-//    public Set<Causes> getCauses() {
-//        return causes;
-//    }
-//
-//    public void setCauses(Set<Causes> causes) {
-//        this.causes = causes;
-//    }
+    public Set<Causes> getCauses() {
+        return causes;
+    }
+
+    public void setCauses(Set<Causes> causes) {
+        this.causes = causes;
+    }
 }

@@ -2,10 +2,11 @@ package com.proxima.ngo.api.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.proxima.ngo.api.model.audit.DateAudit;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 
@@ -15,21 +16,12 @@ public class Causes extends DateAudit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String cover;
     private String title;
     private String email;
-
     @Column(length=500)
     private String description;
     private String location;
-
-
-
-//
-//    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-//    @JoinColumn()
-//    private User user;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Photos> photos;
@@ -38,14 +30,14 @@ public class Causes extends DateAudit {
     @JsonIgnore
     private List<Posts> posts;
 
-    @OneToMany( cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JsonIgnore
-    private Set<CauseType> types;
+    @OneToMany(mappedBy = "causes",cascade = CascadeType.ALL)
+    @LazyCollection(LazyCollectionOption.FALSE)
+    private List<CauseType> types;
 
 
-
-
-
+    @ManyToOne()
+    @JoinColumn
+    private User user;
 
     public Causes() {
     }
@@ -114,19 +106,19 @@ public class Causes extends DateAudit {
         this.posts = posts;
     }
 
-    public Set<CauseType> getTypes() {
+    public List<CauseType> getTypes() {
         return types;
     }
 
-    public void setTypes(Set<CauseType> types) {
+    public void setTypes(List<CauseType> types) {
         this.types = types;
     }
 
-//    public User getUser() {
-//        return user;
-//    }
-//
-//    public void setUser(User user) {
-//        this.user = user;
-//    }
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 }

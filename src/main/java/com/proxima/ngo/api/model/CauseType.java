@@ -13,7 +13,7 @@ public class CauseType {
     private String title;
 
     @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-    @JoinColumn()
+    @JoinColumn(name = "CausesID")
     private Causes causes;
 
     public CauseType() {
@@ -35,11 +35,4 @@ public class CauseType {
         this.title = title;
     }
 
-    public Causes getCauses() {
-        return causes;
-    }
-
-    public void setCauses(Causes causes) {
-        this.causes = causes;
-    }
 }

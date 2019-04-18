@@ -43,11 +43,11 @@ public class Photos {
         this.type = type;
     }
 
-    public Causes getCauses() {
-        return causes;
-    }
-
-    public void setCauses(Causes causes) {
-        this.causes = causes;
-    }
+//    public Causes getCauses() {
+//        return causes;
+//    }
+//
+//    public void setCauses(Causes causes) {
+//        this.causes = causes;
+//    }
 }

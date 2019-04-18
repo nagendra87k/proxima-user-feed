@@ -1,6 +1,9 @@
 package com.proxima.ngo.api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.proxima.ngo.api.model.audit.DateAudit;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -18,8 +21,9 @@ public class Posts extends DateAudit {
     @JoinColumn
     private Causes causes;
 
-    @OneToMany( mappedBy = "posts",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Images> postImaes = new ArrayList<>();
+    @OneToMany(cascade = CascadeType.ALL)
+    @LazyCollection(LazyCollectionOption.FALSE)
+    private List<Images> images;
 
     @Column(length = 500)
     private String description;
@@ -49,12 +53,12 @@ public class Posts extends DateAudit {
         this.causes = causes;
     }
 
-    public List<Images> getPostImaes() {
-        return postImaes;
+    public List<Images> getImages() {
+        return images;
     }
 
-    public void setPostImaes(List<Images> postImaes) {
-        this.postImaes = postImaes;
+    public void setImages(List<Images> images) {
+        this.images = images;
     }
 
     public String getDescription() {

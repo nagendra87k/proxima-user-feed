@@ -3,11 +3,10 @@ package com.proxima.ngo.api.payload;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 @JsonAutoDetect
-public class WeeklyRaisedFeedResponse{
+public class CauseRaisedFeedResponse{
 
     private String title;
-    private String amount;
-    private String Feedtype = "Raised";
+    private String amount="$24";
 
     public String getTitle() {
         return title;
@@ -25,11 +24,4 @@ public class WeeklyRaisedFeedResponse{
         this.amount = amount;
     }
 
-    public String getFeedtype() {
-        return Feedtype;
-    }
-
-    public void setFeedtype(String feedtype) {
-        Feedtype = feedtype;
-    }
 }

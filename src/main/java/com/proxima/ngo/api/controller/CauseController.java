@@ -1,6 +1,8 @@
 package com.proxima.ngo.api.controller;
 
 
+import com.google.common.collect.ImmutableSet;
+import com.proxima.ngo.api.exception.AppException;
 import com.proxima.ngo.api.exception.ResourceNotFoundException;
 import com.proxima.ngo.api.model.*;
 import com.proxima.ngo.api.payload.*;
@@ -11,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -56,7 +57,7 @@ public class CauseController {
 
     @PostMapping(value = "/create",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Transactional
-    public ResponseEntity<?> createCause(@RequestPart(value = "cover") MultipartFile cover,@RequestPart(value = "photos") MultipartFile[] photos, @RequestParam("title") String title,@RequestParam("description") String description,@RequestParam("location") String location,@RequestParam("email") String email){
+    public ResponseEntity<?> createCause(@RequestPart(value = "cover") MultipartFile cover,@RequestPart(value = "photos") MultipartFile[] photos, @RequestParam("title") String title,@RequestParam("description") String description,@RequestParam("location") String location,@RequestParam("email") String email,@RequestParam("type") String type){
 
         User user = userRepository.findByEmail(email).orElseThrow(()->new ResourceNotFoundException("Email", "id", email));
         Boolean isAvailable = userRepository.existsByEmail(email);
@@ -65,6 +66,10 @@ public class CauseController {
         causes.setDescription(description);
         causes.setLocation(location);
         causes.setEmail(email);
+
+//        CauseType causeType = causeTypeRepository.findByTitle(type).orElseThrow(() -> new AppException("Cause tpe not set."));
+//        causes.setTypes(Collections.singletonList(causeType));
+
         if (isAvailable){
             String coustomName;
             Causes causes1 = causeRepository.save(causes);
@@ -130,14 +135,19 @@ public class CauseController {
     }
 
     @GetMapping("/details")
-    public ResponseEntity getCauseDetailsById(@RequestParam(value = "id", required = true) Long id){
+    public ResponseEntity<?> getCauseDetailsById(@RequestParam(value = "id", required = true) Long id){
+
+        Map<String,Object> data = new HashMap();
+        List<CauseType> causeType = causeTypeRepository.findAll();
         Optional<Causes> causes = causeRepository.findById(id);
-        return ResponseEntity.ok().body(causes);
+        data.put("CauseType",causeType);
+        data.put("CauseDetails",Collections.singleton(causes));
+        return ResponseEntity.ok().body(data);
     }
 
     @PostMapping(value = "/update",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Transactional
-    public ResponseEntity<?> updateCause(@RequestBody @RequestParam("id") Long id,@RequestPart(value = "cover") MultipartFile cover,@RequestPart(value = "photos") MultipartFile[] photos, @RequestParam("title") String title,@RequestParam("description") String description,@RequestParam("location") String location,@RequestParam("email") String email,@RequestParam("type") CauseType type){
+    public ResponseEntity<?> updateCause(@RequestBody @RequestParam("id") Long id,@RequestPart(value = "cover") MultipartFile cover,@RequestPart(value = "photos") MultipartFile[] photos, @RequestParam("title") String title,@RequestParam("description") String description,@RequestParam("location") String location,@RequestParam("email") String email,@RequestParam("type") String type){
 
         User user = userRepository.findByEmail(email).orElseThrow(()->new ResourceNotFoundException("Email", "id", email));
 
@@ -147,7 +157,8 @@ public class CauseController {
         causes.setDescription(description);
         causes.setLocation(location);
         causes.setEmail(email);
-//        causes.setTypes(type);
+//        CauseType causeType = causeTypeRepository.findByTitle(type).orElseThrow(() -> new AppException("Cause tpe not set."));
+//        causes.setTypes(Collections.singletonList(causeType));
         String coustomName;
         Long causeId = id;
         Long orgId = user.getId();
@@ -240,7 +251,7 @@ public class CauseController {
                 imagesList.add(postImages);
                 i++;
             }
-            posts.setPostImaes(imagesList);
+            posts.setImages(imagesList);
             postRepository.save(posts);
             return ResponseEntity.ok(new ApiResponse(true, "Post Created successfully"));
 
@@ -255,25 +266,37 @@ public class CauseController {
 
         Pageable pageable = PageRequest.of(page, limit);
         Boolean isAvailable = userRepository.existsByEmail(email);
-        User org = userRepository.findByEmailOrId(email);
         if (isAvailable) {
 
             List<Object> resultsData = new ArrayList<>();
             List<Causes> causes = causeRepository.findAllByEmail(email,pageable);
             List<CauseFeedResponse> causeFeedResponses = ObjectMapperUtils.mapAll(causes, CauseFeedResponse.class);
-            List<Posts> posts = postRepository.findAllPosts(pageable);
+            List<Posts> posts = postRepository.findAll();
             List<PostFeedResponse> feedResponseList = ObjectMapperUtils.mapAll(posts, PostFeedResponse.class);
-            List<WeeklyRaisedFeedResponse> weeklyRaisedFeedResponses = ObjectMapperUtils.mapAll(causes, WeeklyRaisedFeedResponse.class);
+
+
+            List<CauseRaisedFeedResponse> weeklyRaisedFeedResponses = ObjectMapperUtils.mapAll(causes, CauseRaisedFeedResponse.class);
+
+            WeeklyRaisedResponse weeklyRaisedResponse = new WeeklyRaisedResponse();
+            weeklyRaisedResponse.setCause_raised(weeklyRaisedFeedResponses);
+
+//            List<?> weeklyRaisedFeedList = new ArrayList(Arrays.asList(weeklyRaisedFeedResponses));
 
             resultsData.addAll(causeFeedResponses);
             resultsData.addAll(feedResponseList);
-            resultsData.addAll(weeklyRaisedFeedResponses);
-
-//            resultsData.stream().sorted((object1, object2) -> object1..compareTo(object2.getName()));
+            resultsData.add(weeklyRaisedResponse);
             return ResponseEntity.ok().body(resultsData);
 
         } else {
             return ResponseEntity.badRequest().body(new ApiResponse(false, "Email id " + email + " doesn't exist."));
         }
+    }
+
+    @GetMapping("/posts")
+    public ResponseEntity getAllPost(){
+
+        Pageable pageable = PageRequest.of(0, 5);
+        List<Posts> posts = postRepository.findAll();
+        return ResponseEntity.ok().body(posts);
     }
 }

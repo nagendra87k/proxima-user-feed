@@ -12,7 +12,7 @@ public class PostFeedResponse {
     private Instant createdAt;
     private List<Images> images;
     private String organizationName = "Wild";
-    private String Feedtype = "Post";
+    private int Feedtype = 2;
 
     public Long getId() {
         return id;
@@ -54,11 +54,11 @@ public class PostFeedResponse {
         this.organizationName = organizationName;
     }
 
-    public String getFeedtype() {
+    public int getFeedtype() {
         return Feedtype;
     }
 
-    public void setFeedtype(String feedtype) {
+    public void setFeedtype(int feedtype) {
         Feedtype = feedtype;
     }
 }
