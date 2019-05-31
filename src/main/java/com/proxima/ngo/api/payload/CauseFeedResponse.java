@@ -1,6 +1,7 @@
 package com.proxima.ngo.api.payload;
 
 import com.proxima.ngo.api.model.Photos;
+import com.proxima.ngo.api.model.User;
 
 import java.time.Instant;
 import java.util.List;
@@ -13,8 +14,12 @@ public class CauseFeedResponse {
     private List<Photos> photos;
     private String amount;
     private Instant createdAt;
+    private Instant updatedAt;
     private String organizationName = "Wild";
     private int Feedtype = 1;
+    private User user;
+
+    private Boolean isUpdated;
 
     public Long getId() {
         return id;
@@ -78,5 +83,29 @@ public class CauseFeedResponse {
 
     public void setFeedtype(int feedtype) {
         Feedtype = feedtype;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public Boolean getUpdated() {
+        return isUpdated;
+    }
+
+    public void setUpdated(Boolean updated) {
+        isUpdated = updated;
     }
 }

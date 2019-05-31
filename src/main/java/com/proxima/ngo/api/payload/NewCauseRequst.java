@@ -7,7 +7,7 @@ public class NewCauseRequst {
     private String title;
     private String description;
     private String photos;
-    //private Set<CauseType> type = new HashSet<>();
+    //private Set<Type> type = new HashSet<>();
     private String location;
     private String email;
 

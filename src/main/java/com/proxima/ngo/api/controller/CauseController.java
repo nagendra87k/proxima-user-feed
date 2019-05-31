@@ -1,7 +1,6 @@
 package com.proxima.ngo.api.controller;
 
 
-import com.google.common.collect.ImmutableSet;
 import com.proxima.ngo.api.exception.AppException;
 import com.proxima.ngo.api.exception.ResourceNotFoundException;
 import com.proxima.ngo.api.model.*;
@@ -57,7 +56,7 @@ public class CauseController {
 
     @PostMapping(value = "/create",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Transactional
-    public ResponseEntity<?> createCause(@RequestPart(value = "cover") MultipartFile cover,@RequestPart(value = "photos") MultipartFile[] photos, @RequestParam("title") String title,@RequestParam("description") String description,@RequestParam("location") String location,@RequestParam("email") String email,@RequestParam("type") String type){
+    public ResponseEntity<?> createCause(@RequestPart(value = "cover") MultipartFile cover,@RequestPart(value = "photos") MultipartFile[] photos, @RequestParam("title") String title,@RequestParam("description") String description,@RequestParam("location") String location, @RequestParam("email") String email, @RequestParam("type_id") Long typeId){
 
         User user = userRepository.findByEmail(email).orElseThrow(()->new ResourceNotFoundException("Email", "id", email));
         Boolean isAvailable = userRepository.existsByEmail(email);
@@ -67,8 +66,13 @@ public class CauseController {
         causes.setLocation(location);
         causes.setEmail(email);
 
-//        CauseType causeType = causeTypeRepository.findByTitle(type).orElseThrow(() -> new AppException("Cause tpe not set."));
-//        causes.setTypes(Collections.singletonList(causeType));
+        user.setId(user.getId());
+        causes.setUser(user);
+        causes.setUpdated(false);
+
+        Type type = causeTypeRepository.findAllById(typeId).orElseThrow(()-> new AppException("Cause type not set."));
+        type.setId(type.getId());
+        causes.setType(type);
 
         if (isAvailable){
             String coustomName;
@@ -108,8 +112,8 @@ public class CauseController {
 
     @GetMapping("/casueType")
     public ResponseEntity getCauseType(){
-        List<CauseType> causeType = causeTypeRepository.findAll();
-        return ResponseEntity.ok().body(causeType);
+        List<Type> type = causeTypeRepository.findAll();
+        return ResponseEntity.ok().body(type);
     }
 
     @PostMapping("/organization")
@@ -138,16 +142,16 @@ public class CauseController {
     public ResponseEntity<?> getCauseDetailsById(@RequestParam(value = "id", required = true) Long id){
 
         Map<String,Object> data = new HashMap();
-        List<CauseType> causeType = causeTypeRepository.findAll();
+        List<Type> type = causeTypeRepository.findAll();
         Optional<Causes> causes = causeRepository.findById(id);
-        data.put("CauseType",causeType);
-        data.put("CauseDetails",Collections.singleton(causes));
+        data.put("CauseType", type);
+        data.put("CauseDetails",causes);
         return ResponseEntity.ok().body(data);
     }
 
     @PostMapping(value = "/update",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Transactional
-    public ResponseEntity<?> updateCause(@RequestBody @RequestParam("id") Long id,@RequestPart(value = "cover") MultipartFile cover,@RequestPart(value = "photos") MultipartFile[] photos, @RequestParam("title") String title,@RequestParam("description") String description,@RequestParam("location") String location,@RequestParam("email") String email,@RequestParam("type") String type){
+    public ResponseEntity<?> updateCause(@RequestBody @RequestParam("id") Long id,@RequestPart(value = "cover") MultipartFile cover,@RequestPart(value = "photos") MultipartFile[] photos, @RequestParam("title") String title,@RequestParam("description") String description,@RequestParam("location") String location,@RequestParam("email") String email, @RequestParam("type_id") Long typeId){
 
         User user = userRepository.findByEmail(email).orElseThrow(()->new ResourceNotFoundException("Email", "id", email));
 
@@ -157,8 +161,12 @@ public class CauseController {
         causes.setDescription(description);
         causes.setLocation(location);
         causes.setEmail(email);
-//        CauseType causeType = causeTypeRepository.findByTitle(type).orElseThrow(() -> new AppException("Cause tpe not set."));
-//        causes.setTypes(Collections.singletonList(causeType));
+        user.setId(user.getId());
+        causes.setUser(user);
+        causes.setUpdated(true);
+        Type type = causeTypeRepository.findAllById(typeId).orElseThrow(()-> new AppException("Cause type not set."));
+        type.setId(type.getId());
+        causes.setType(type);
         String coustomName;
         Long causeId = id;
         Long orgId = user.getId();
@@ -224,10 +232,14 @@ public class CauseController {
     public ResponseEntity<?> createPost(@RequestBody @RequestParam(value = "cause_id", required = true) Long cause_id, @RequestPart(value = "primary_photo") MultipartFile primary_photo,@RequestPart(value = "images") MultipartFile[] images, @RequestParam("description") String description){
 
         Boolean isAvailable = causeRepository.existsById(cause_id);
+       // Causes causes = causeRepository.findCausesById(cause_id);
         Causes causes = causeRepository.findCausesById(cause_id);
         User org = userRepository.findByEmailOrId(causes.getEmail());
         Posts posts = new Posts();
         posts.setDescription(description);
+        causes.setId(causes.getId());
+        posts.setCauses(causes);
+
         if (isAvailable){
             Posts postsData = postRepository.save(posts);
             Long postId = postsData.getId();
@@ -270,6 +282,8 @@ public class CauseController {
 
             List<Object> resultsData = new ArrayList<>();
             List<Causes> causes = causeRepository.findAllByEmail(email,pageable);
+
+
             List<CauseFeedResponse> causeFeedResponses = ObjectMapperUtils.mapAll(causes, CauseFeedResponse.class);
             List<Posts> posts = postRepository.findAll();
             List<PostFeedResponse> feedResponseList = ObjectMapperUtils.mapAll(posts, PostFeedResponse.class);
@@ -299,4 +313,14 @@ public class CauseController {
         List<Posts> posts = postRepository.findAll();
         return ResponseEntity.ok().body(posts);
     }
+
+    @PostMapping("/denotion")
+    public ResponseEntity addDenotion(){
+
+        Pageable pageable = PageRequest.of(0, 5);
+        List<Posts> posts = postRepository.findAll();
+
+        return ResponseEntity.ok().body(posts);
+    }
+
 }

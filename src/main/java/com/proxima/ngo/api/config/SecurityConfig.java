@@ -89,6 +89,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .permitAll()
                 .antMatchers("/cause/casueType","/cause/create","/cause/organization","/cause/details","/cause/update","/cause/delete","/cause/causeList","/cause/loadfile","/cause/create-post","/cause/feeds","/cause/posts")
                 .permitAll()
+                .antMatchers("/donation/add")
+                .permitAll()
                 .antMatchers(HttpMethod.GET,  "/api/polls/**","/api/users/**","/organization/users/**","/cause/loadfile/**")
                 .permitAll()
                 .anyRequest()

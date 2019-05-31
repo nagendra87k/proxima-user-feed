@@ -1,5 +1,6 @@
 package com.proxima.ngo.api.payload;
 
+import com.proxima.ngo.api.model.Causes;
 import com.proxima.ngo.api.model.Images;
 
 import java.time.Instant;
@@ -9,10 +10,13 @@ public class PostFeedResponse {
 
     private Long id;
     private String description;
+    private String primaryPhoto;
     private Instant createdAt;
     private List<Images> images;
     private String organizationName = "Wild";
     private int Feedtype = 2;
+    private Causes causes;
+    private Instant updatedAt;
 
     public Long getId() {
         return id;
@@ -60,5 +64,29 @@ public class PostFeedResponse {
 
     public void setFeedtype(int feedtype) {
         Feedtype = feedtype;
+    }
+
+    public Causes getCauses() {
+        return causes;
+    }
+
+    public void setCauses(Causes causes) {
+        this.causes = causes;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public String getPrimaryPhoto() {
+        return primaryPhoto;
+    }
+
+    public void setPrimaryPhoto(String primaryPhoto) {
+        this.primaryPhoto = primaryPhoto;
     }
 }

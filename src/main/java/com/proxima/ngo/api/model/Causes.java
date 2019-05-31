@@ -1,16 +1,17 @@
 package com.proxima.ngo.api.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.proxima.ngo.api.model.audit.DateAudit;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.util.List;
-import java.util.Set;
 
 
 @Entity
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Causes extends DateAudit {
 
     @Id
@@ -23,21 +24,27 @@ public class Causes extends DateAudit {
     private String description;
     private String location;
 
+    private Boolean isUpdated;
+
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Photos> photos;
 
-    @OneToMany( cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "causes",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Posts> posts;
 
-    @OneToMany(mappedBy = "causes",cascade = CascadeType.ALL)
-    @LazyCollection(LazyCollectionOption.FALSE)
-    private List<CauseType> types;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "type_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Type type;
 
 
-    @ManyToOne()
-    @JoinColumn
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
+
+
 
     public Causes() {
     }
@@ -106,12 +113,12 @@ public class Causes extends DateAudit {
         this.posts = posts;
     }
 
-    public List<CauseType> getTypes() {
-        return types;
+    public Type getType() {
+        return type;
     }
 
-    public void setTypes(List<CauseType> types) {
-        this.types = types;
+    public void setType(Type type) {
+        this.type = type;
     }
 
     public User getUser() {
@@ -121,4 +128,14 @@ public class Causes extends DateAudit {
     public void setUser(User user) {
         this.user = user;
     }
+
+    public Boolean getUpdated() {
+        return isUpdated;
+    }
+
+    public void setUpdated(Boolean updated) {
+        isUpdated = updated;
+    }
+
+
 }
