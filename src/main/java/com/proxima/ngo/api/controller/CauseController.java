@@ -232,11 +232,13 @@ public class CauseController {
     public ResponseEntity<?> createPost(@RequestBody @RequestParam(value = "cause_id", required = true) Long cause_id, @RequestPart(value = "primary_photo") MultipartFile primary_photo,@RequestPart(value = "images") MultipartFile[] images, @RequestParam("description") String description){
 
         Boolean isAvailable = causeRepository.existsById(cause_id);
-       // Causes causes = causeRepository.findCausesById(cause_id);
+
         Causes causes = causeRepository.findCausesById(cause_id);
         User org = userRepository.findByEmailOrId(causes.getEmail());
+
         Posts posts = new Posts();
         posts.setDescription(description);
+
         causes.setId(causes.getId());
         posts.setCauses(causes);
 
@@ -280,25 +282,24 @@ public class CauseController {
         Boolean isAvailable = userRepository.existsByEmail(email);
         if (isAvailable) {
 
-            List<Object> resultsData = new ArrayList<>();
+            List<Object> resultsData = new ArrayList<>();//Output List
+
             List<Causes> causes = causeRepository.findAllByEmail(email,pageable);
-
-
             List<CauseFeedResponse> causeFeedResponses = ObjectMapperUtils.mapAll(causes, CauseFeedResponse.class);
+
             List<Posts> posts = postRepository.findAll();
             List<PostFeedResponse> feedResponseList = ObjectMapperUtils.mapAll(posts, PostFeedResponse.class);
 
-
             List<CauseRaisedFeedResponse> weeklyRaisedFeedResponses = ObjectMapperUtils.mapAll(causes, CauseRaisedFeedResponse.class);
-
             WeeklyRaisedResponse weeklyRaisedResponse = new WeeklyRaisedResponse();
             weeklyRaisedResponse.setCause_raised(weeklyRaisedFeedResponses);
-
-//            List<?> weeklyRaisedFeedList = new ArrayList(Arrays.asList(weeklyRaisedFeedResponses));
 
             resultsData.addAll(causeFeedResponses);
             resultsData.addAll(feedResponseList);
             resultsData.add(weeklyRaisedResponse);
+
+            Collections.sort(resultsData, Collections.reverseOrder());
+
             return ResponseEntity.ok().body(resultsData);
 
         } else {

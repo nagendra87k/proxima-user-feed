@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.proxima.ngo.api.model.User;
 
 @JsonAutoDetect
-public class CauseRaisedFeedResponse{
+public class CauseRaisedFeedResponse implements Comparable<CauseRaisedFeedResponse>{
 
     private String title;
     private String amount="$24";
@@ -32,5 +32,10 @@ public class CauseRaisedFeedResponse{
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    @Override
+    public int compareTo(CauseRaisedFeedResponse o) {
+        return o.getTitle().compareTo(o.getTitle());
     }
 }

@@ -6,7 +6,7 @@ import com.proxima.ngo.api.model.Images;
 import java.time.Instant;
 import java.util.List;
 
-public class PostFeedResponse {
+public class PostFeedResponse implements Comparable<PostFeedResponse>{
 
     private Long id;
     private String description;
@@ -88,5 +88,11 @@ public class PostFeedResponse {
 
     public void setPrimaryPhoto(String primaryPhoto) {
         this.primaryPhoto = primaryPhoto;
+    }
+
+
+    @Override
+    public int compareTo(PostFeedResponse o) {
+        return o.getCreatedAt().compareTo(o.getCreatedAt());
     }
 }

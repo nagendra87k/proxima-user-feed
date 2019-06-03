@@ -17,10 +17,13 @@ public interface CauseRepository extends PagingAndSortingRepository<Causes,Long>
     List<Causes> findByEmail(String email);
     void deleteById(Long id);
     Optional<Causes> findById(Long id);
+
     List<Causes> findAllByEmail(String email, Pageable pageable);
 
-    @Query("SELECT c FROM Causes c WHERE c.id=id")
-    Causes findCausesById(@Param("id") Long id);
+    //@Query("SELECT c FROM Causes c WHERE id=id")
+
+    @Query(value = "SELECT * FROM causes u WHERE u.id =?1 limit 1", nativeQuery = true)
+    Causes findCausesById(Long id);
 
 
 

@@ -6,7 +6,7 @@ import com.proxima.ngo.api.model.User;
 import java.time.Instant;
 import java.util.List;
 
-public class CauseFeedResponse {
+public class CauseFeedResponse implements Comparable<CauseFeedResponse>{
 
     private Long id;
     private String title;
@@ -107,5 +107,10 @@ public class CauseFeedResponse {
 
     public void setUpdated(Boolean updated) {
         isUpdated = updated;
+    }
+
+    @Override
+    public int compareTo(CauseFeedResponse o) {
+        return o.getCreatedAt().compareTo(o.getCreatedAt());
     }
 }
